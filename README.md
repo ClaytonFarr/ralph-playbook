@@ -18,7 +18,8 @@ Below is the result - a (likely OCD-fueled) Ralph Playbook that organizes the mi
 
 > Digging into all of this has also brought to mind some possibly valuable [additional enhancements](#enhancements) to the core approach that aim to stay aligned with the guidelines that make Ralph work so well.
 
-> [!TIP] > [📖 View as Formatted Guide →](https://ClaytonFarr.github.io/ralph-playbook/)
+> [!TIP]
+> [📖 View as Formatted Guide →](https://ClaytonFarr.github.io/ralph-playbook/)
 
 ---
 
