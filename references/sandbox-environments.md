@@ -151,6 +151,67 @@ _Links:_
 
 ---
 
+### exe.dev
+
+Persistent VM platform created by David Crawshaw (former Tailscale CTO) and Josh Bleecher Snyder (former Braintree Director of Engineering). Launched December 2025 in developer preview.
+
+_Key Features:_
+
+- ~2 second VM creation
+- Persistent disk storage (not ephemeral)
+- SSH-native interface (`ssh exe.dev`)
+- Automatic TLS and custom domains
+- Built-in authentication ("Login with exe")
+- Shelley AI agent included (web-based, mobile-friendly)
+- No SDK required - pure SSH-based interaction
+
+_Philosophy:_ exe.dev takes an explicitly anti-serverless, persistent disk approach. Their core thesis: "Persistent, private, fast-starting VMs with no marginal cost per-VM." Unlike ephemeral sandboxes, exe.dev treats VMs as actual computers with persistent state, similar to Fly.io's Sprites but with an SSH-first design philosophy.
+
+_Unique Features:_
+
+- _SSH-native_: No SDK needed, just `ssh exe.dev` to access
+- _Persistent disk_: Data survives indefinitely, not ephemeral
+- _Shelley AI agent_: Built-in web-based AI assistant that reads CLAUDE.md and AGENTS.md
+- _Mobile-friendly_: Shelley works on mobile devices
+- _Custom domains_: Automatic TLS with custom domain support
+- _Zero marginal cost_: No per-VM overhead once running
+
+_Pricing:_
+
+| Plan       | Monthly | VMs | CPU        | RAM        | Disk  | Bandwidth |
+| ---------- | ------- | --- | ---------- | ---------- | ----- | --------- |
+| Individual | $20     | 25  | 2 (shared) | 8GB shared | 25 GB | 100 GB    |
+
+_Specs:_
+
+| Spec       | Value                                  |
+| ---------- | -------------------------------------- |
+| Isolation  | Full VMs (Cloud Hypervisor, KVM-based) |
+| Cold Start | ~2 seconds                             |
+| Timeout    | None (persistent)                      |
+| vCPU       | 2 shared                               |
+| RAM        | 8 GB shared                            |
+| Disk       | 25 GB persistent                       |
+| Interface  | SSH (`ssh exe.dev`)                    |
+| AI Agent   | Shelley (built-in)                     |
+
+_Limitations:_
+
+- Developer preview (launched December 2025) - ecosystem still maturing
+- Shared resources on Individual plan (2 vCPU, 8GB RAM shared across VMs)
+- Smaller VM allocation compared to E2B/Sprites (25 VMs vs unlimited)
+- Less documentation and community resources than established platforms
+- No official SDK - relies on SSH interface
+
+_Links:_
+
+- Official: https://exe.dev/
+- Blog: https://blog.exe.dev/
+- Documentation: https://exe.dev/docs
+- Shelley AI Agent: https://github.com/boldsoftware/shelley
+
+---
+
 ### Modal
 
 Modal Sandboxes are the Modal primitive for safely running untrusted code from LLMs, users, or third-party sources. Built on Modal's serverless container fabric with gVisor isolation.
@@ -332,23 +393,23 @@ _Links:_
 
 ## Comparison Table
 
-| Feature          | Sprites             | E2B                 | Modal                | Cloudflare         |
-| ---------------- | ------------------- | ------------------- | -------------------- | ------------------ |
-| Setup            | Easy                | Very Easy           | Easy                 | Easy               |
-| Free Tier        | $30 credit          | $100 credit         | $30/month            | $5/mo Workers Paid |
-| Isolation        | Firecracker microVM | Firecracker microVM | gVisor container     | Container          |
-| Cold Start       | <1 second           | ~150ms              | 2-5s (or <3s w/snap) | 1-5 seconds        |
-| Max Timeout      | None (persistent)   | 24 hours (Pro)      | 24 hours             | Configurable       |
-| Claude CLI       | Pre-installed       | Prebuilt template   | Manual               | Manual             |
-| Git Support      | Yes                 | Yes                 | Yes                  | Yes                |
-| Persistent Files | Yes (permanent)     | 24 hours            | Via Volumes          | Via R2 FUSE mount  |
-| Checkpoints      | Yes (~300ms)        | Pause/Resume (Beta) | Memory Snapshots     | No                 |
-| Network Controls | Layer 3 policies    | Allow/deny lists    | CIDR allowlists      | Bindings model     |
-| Edge Locations   | Fly.io regions      | -                   | -                    | 330+ global        |
-| Max Concurrent   | 10 active (base)    | Plan-based          | 10,000+              | Plan-based         |
-| Self-Hosting     | Fly.io only         | Experimental        | No                   | No                 |
-| MCP Tools        | -                   | 200+ (Docker)       | -                    | -                  |
-| Best For         | Long-running agents | AI agent loops      | Python ML workloads  | Edge apps          |
+| Feature          | Sprites             | E2B                 | Modal                | Cloudflare         | exe.dev               |
+| ---------------- | ------------------- | ------------------- | -------------------- | ------------------ | --------------------- |
+| Setup            | Easy                | Very Easy           | Easy                 | Easy               | Very Easy (SSH)       |
+| Free Tier        | $30 credit          | $100 credit         | $30/month            | $5/mo Workers Paid | None ($20/mo)         |
+| Isolation        | Firecracker microVM | Firecracker microVM | gVisor container     | Container          | Full VM (KVM)         |
+| Cold Start       | <1 second           | ~150ms              | 2-5s (or <3s w/snap) | 1-5 seconds        | ~2 seconds            |
+| Max Timeout      | None (persistent)   | 24 hours (Pro)      | 24 hours             | Configurable       | None (persistent)     |
+| Claude CLI       | Pre-installed       | Prebuilt template   | Manual               | Manual             | Via Shelley agent     |
+| Git Support      | Yes                 | Yes                 | Yes                  | Yes                | Yes                   |
+| Persistent Files | Yes (permanent)     | 24 hours            | Via Volumes          | Via R2 FUSE mount  | Yes (permanent)       |
+| Checkpoints      | Yes (~300ms)        | Pause/Resume (Beta) | Memory Snapshots     | No                 | No                    |
+| Network Controls | Layer 3 policies    | Allow/deny lists    | CIDR allowlists      | Bindings model     | -                     |
+| Edge Locations   | Fly.io regions      | -                   | -                    | 330+ global        | -                     |
+| Max Concurrent   | 10 active (base)    | Plan-based          | 10,000+              | Plan-based         | 25 VMs (Individual)   |
+| Self-Hosting     | Fly.io only         | Experimental        | No                   | No                 | No                    |
+| MCP Tools        | -                   | 200+ (Docker)       | -                    | -                  | -                     |
+| Best For         | Long-running agents | AI agent loops      | Python ML workloads  | Edge apps          | SSH-native persistent |
 
 ---
 
