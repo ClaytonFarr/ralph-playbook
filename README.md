@@ -273,10 +273,10 @@ _This enhancement uses two saved prompt files:_
 #!/bin/bash
 # Usage: ./loop.sh [plan] [max_iterations]
 # Examples:
-#   ./loop.sh              # Build mode, unlimited tasks
-#   ./loop.sh 20           # Build mode, max 20 tasks
-#   ./loop.sh plan         # Plan mode, unlimited tasks
-#   ./loop.sh plan 5       # Plan mode, max 5 tasks
+#   ./loop.sh              # Build mode, unlimited iterations
+#   ./loop.sh 20           # Build mode, max 20 iterations
+#   ./loop.sh plan         # Plan mode, unlimited iterations
+#   ./loop.sh plan 5       # Plan mode, max 5 iterations
 
 # Parse arguments
 if [ "$1" = "plan" ]; then
@@ -285,7 +285,7 @@ if [ "$1" = "plan" ]; then
     PROMPT_FILE="PROMPT_plan.md"
     MAX_ITERATIONS=${2:-0}
 elif [[ "$1" =~ ^[0-9]+$ ]]; then
-    # Build mode with max tasks
+    # Build mode with max iterations
     MODE="build"
     PROMPT_FILE="PROMPT_build.md"
     MAX_ITERATIONS=$1
@@ -303,7 +303,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "Mode:   $MODE"
 echo "Prompt: $PROMPT_FILE"
 echo "Branch: $CURRENT_BRANCH"
-[ $MAX_ITERATIONS -gt 0 ] && echo "Max:    $MAX_ITERATIONS iterations (number of tasks)"
+[ $MAX_ITERATIONS -gt 0 ] && echo "Max:    $MAX_ITERATIONS iterations"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Verify prompt file exists
@@ -314,22 +314,36 @@ fi
 
 while true; do
     if [ $MAX_ITERATIONS -gt 0 ] && [ $ITERATION -ge $MAX_ITERATIONS ]; then
-        echo "Reached max iterations (number of tasks): $MAX_ITERATIONS"
+        echo "Reached max iterations: $MAX_ITERATIONS"
         break
     fi
 
     # Run Ralph iteration with selected prompt
-    # -p: Headless mode (non-interactive, reads from stdin)
-    # --dangerously-skip-permissions: Auto-approve all tool calls (YOLO mode)
-    # --output-format=stream-json: Structured output for logging/monitoring
-    # --model opus: Primary agent uses Opus for complex reasoning (task selection, prioritization)
-    #               Can use 'sonnet' in build mode for speed if plan is clear and tasks well-defined
-    # --verbose: Detailed execution logging
-    cat "$PROMPT_FILE" | claude -p \
+    #  -p (headless mode): Enables non-interactive operation, accepts prompt as argument
+    #  --dangerously-skip-permissions: Bypasses all permission prompts for fully automated runs
+    #  --output-format stream-json: Outputs structured JSON for parsing by `parse_stream.js`
+    #  --include-partial-messages: Streams partial content in real-time as Claude generates it
+    #  --model opus: Primary agent uses Opus for complex reasoning (can use `sonnet` for speed if tasks are clear)
+    #  --verbose: Provides detailed execution logging
+
+    FULL_PROMPT="$(cat "$PROMPT_FILE")
+
+Execute the instructions above."
+
+    echo "⏳ Running Claude..."
+    echo ""
+
+    # Stream JSON with partial messages, parse for readable output
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    claude -p "$FULL_PROMPT" \
         --dangerously-skip-permissions \
-        --output-format=stream-json \
         --model opus \
-        --verbose
+        --verbose \
+        --output-format stream-json \
+        --include-partial-messages 2>&1 | node "$SCRIPT_DIR/parse_stream.js"
+
+    echo ""
+    echo "✅ Claude iteration complete"
 
     # Push changes after each iteration
     git push origin "$CURRENT_BRANCH" || {
@@ -340,6 +354,111 @@ while true; do
     ITERATION=$((ITERATION + 1))
     echo -e "\n\n======================== LOOP $ITERATION ========================\n"
 done
+```
+
+Add in the root `parse_stream.js` as well → better output format → easier to understand when Ralph needs help:
+
+```js
+#!/usr/bin/env node
+// Parse Claude stream-json output for readable display
+// Usage: claude ... --output-format stream-json | node parse_stream.js
+
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
+
+// Track current tool being called
+let currentTool = null;
+let currentToolInput = '';
+
+// Format tool input for display
+function formatToolInput(name, inputJson) {
+  try {
+    const input = JSON.parse(inputJson);
+    switch (name) {
+      case 'Glob':
+        return input.pattern || '';
+      case 'Grep':
+        return `"${input.pattern || ''}"${input.path ? ` in ${input.path}` : ''}`;
+      case 'Read':
+        return input.file_path?.replace(/.*[\\\/]/, '') || '';
+      case 'Write':
+      case 'Edit':
+        return input.file_path?.replace(/.*[\\\/]/, '') || '';
+      case 'Bash':
+        const cmd = input.command || '';
+        return cmd.length > 60 ? cmd.substring(0, 60) + '...' : cmd;
+      case 'Task':
+        return input.description || input.prompt?.substring(0, 50) + '...' || '';
+      case 'WebFetch':
+        return input.url || '';
+      case 'WebSearch':
+        return input.query || '';
+      default:
+        // For unknown tools, show first meaningful property
+        const keys = Object.keys(input);
+        if (keys.length > 0) {
+          const val = input[keys[0]];
+          if (typeof val === 'string') {
+            return val.length > 50 ? val.substring(0, 50) + '...' : val;
+          }
+        }
+        return '';
+    }
+  } catch (e) {
+    return '';
+  }
+}
+
+rl.on('line', (line) => {
+  try {
+    const data = JSON.parse(line);
+
+    if (data.type === 'stream_event') {
+      const event = data.event;
+
+      if (event?.type === 'content_block_delta') {
+        // Text output
+        const text = event.delta?.text;
+        if (text) process.stdout.write(text);
+
+        // Tool input JSON delta
+        const jsonDelta = event.delta?.partial_json;
+        if (jsonDelta && currentTool) {
+          currentToolInput += jsonDelta;
+        }
+      } else if (event?.type === 'content_block_start') {
+        if (event.content_block?.type === 'tool_use') {
+          currentTool = event.content_block.name;
+          currentToolInput = '';
+        }
+      } else if (event?.type === 'content_block_stop') {
+        // Tool call complete, show summary
+        if (currentTool) {
+          const details = formatToolInput(currentTool, currentToolInput);
+          if (details) {
+            console.log(`\n🔧 ${currentTool}: ${details}`);
+          } else {
+            console.log(`\n🔧 ${currentTool}`);
+          }
+          currentTool = null;
+          currentToolInput = '';
+        }
+      }
+    } else if (data.type === 'result') {
+      const duration = Math.floor((data.duration_ms || 0) / 1000);
+      const cost = data.total_cost_usd || 0;
+      console.log('\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`✅ Done in ${duration}s | Cost: $${cost.toFixed(4)}`);
+    }
+  } catch (e) {
+    // Ignore parse errors for non-JSON lines
+  }
+});
 ```
 
 _Mode selection:_
@@ -356,10 +475,11 @@ _Max-iterations:_
 
 _Claude CLI flags:_
 
-- `-p` (headless mode): Enables non-interactive operation, reads prompt from stdin
+- `-p` (headless mode): Enables non-interactive operation, accepts prompt as argument
 - `--dangerously-skip-permissions`: Bypasses all permission prompts for fully automated runs
-- `--output-format=stream-json`: Outputs structured JSON for logging/monitoring/visualization
-- `--model opus`: Primary agent uses Opus for task selection, prioritization, and coordination (can use `sonnet` for speed if tasks are clear)
+- `--output-format stream-json`: Outputs structured JSON for parsing by `parse_stream.js`
+- `--include-partial-messages`: Streams partial content in real-time as Claude generates it
+- `--model opus`: Primary agent uses Opus for complex reasoning (can use `sonnet` for speed if tasks are clear)
 - `--verbose`: Provides detailed execution logging
 
 ---
@@ -369,6 +489,7 @@ _Claude CLI flags:_
 ```
 project-root/
 ├── loop.sh                         # Ralph loop script
+├── parse_stream.js                 # Generate more readable outputs
 ├── PROMPT_build.md                 # Build mode instructions
 ├── PROMPT_plan.md                  # Plan mode instructions
 ├── AGENTS.md                       # Operational guide loaded each iteration
