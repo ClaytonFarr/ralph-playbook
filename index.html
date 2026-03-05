@@ -979,7 +979,7 @@
               and
               <a href="https://x.com/ryancarson/status/2008548371712135632"
                 >@ryancarson</a
-              >'s overviews helped a lot – right until Geoff came in and
+              >'s overviews helped a lot - right until Geoff came in and
               <a href="https://x.com/GeoffreyHuntley/status/2008731415312236984"
                 >said 'nah'</a
               >.
@@ -996,7 +996,7 @@
             <h3>So what is the optimal way to Ralph?</h3>
 
             <p>
-              Many folks seem to be getting good results with various shapes –
+              Many folks seem to be getting good results with various shapes -
               but I wanted to read the tea leaves as closely as possible from
               the person who not only captured this approach but also has had
               the most ass-time in the seat putting it through its paces.
@@ -1013,7 +1013,7 @@
             </p>
 
             <p>
-              Below is the result – a (likely OCD-fueled) Ralph Playbook that
+              Below is the result - a (likely OCD-fueled) Ralph Playbook that
               organizes the miscellaneous details for putting this all into
               practice w/o hopefully neutering it in the process.
             </p>
@@ -1029,7 +1029,7 @@
             </div>
           </section>
 
-          <p>Hope this helps you out - <a href="https://x.com/ClaytonFarr">Clayton</a></p>
+          <p>Hope this helps you out - <a href="https://x.com/ClaytonFarr">@ClaytonFarr</a></p>
 
           <hr />
 
@@ -1071,7 +1071,11 @@
               Loop
             </h3>
 
-            <h4>Phase 1: Define Requirements (LLM conversation)</h4>
+            <p>
+              This diagram clarified for me that Ralph isn't just "a loop that codes." It's a funnel with 3 Phases, 2 Prompts, and 1 Loop.
+            </p>
+
+            <h4>Phase 1. Define Requirements (LLM conversation)</h4>
             <ul>
               <li>Discuss project ideas → identify Jobs to Be Done (JTBD)</li>
               <li>Break individual JTBD into topic(s) of concern</li>
@@ -1082,7 +1086,7 @@
               </li>
             </ul>
 
-            <h4>Phase 2 / 3: Run Ralph Loop</h4>
+            <h4>Phase 2 / 3. Run Ralph Loop (two modes, swap <code>PROMPT.md</code> as needed)</h4>
             <p>
               Same loop mechanism, different prompts for different objectives:
             </p>
@@ -1118,12 +1122,12 @@
             <h5>Prompt differences per mode:</h5>
             <ul>
               <li>
-                <strong>PLANNING</strong> prompt does gap analysis (specs vs
-                code) and outputs a prioritized TODO list – no implementation,
+                'PLANNING' prompt does gap analysis (specs vs
+                code) and outputs a prioritized TODO list&#8212;no implementation,
                 no commits.
               </li>
               <li>
-                <strong>BUILDING</strong> prompt assumes plan exists, picks
+                'BUILDING' prompt assumes plan exists, picks
                 tasks from it, implements, runs tests (backpressure), commits.
               </li>
             </ul>
@@ -1131,19 +1135,19 @@
             <h5>Why use the loop for both modes?</h5>
             <ul>
               <li>
-                <strong>BUILDING requires it:</strong> inherently iterative
+                BUILDING requires it: inherently iterative
                 (many tasks × fresh context = isolation)
               </li>
               <li>
-                <strong>PLANNING uses it for consistency:</strong> same
+                PLANNING uses it for consistency: same
                 execution model, though often completes in 1-2 iterations
               </li>
               <li>
-                <strong>Flexibility:</strong> if plan needs refinement, loop
+                Flexibility: if plan needs refinement, loop
                 allows multiple passes reading its own output
               </li>
               <li>
-                <strong>Simplicity:</strong> one mechanism for everything; clean
+                Simplicity: one mechanism for everything; clean
                 file I/O; easy stop/restart
               </li>
             </ul>
@@ -1218,7 +1222,7 @@
               </div>
             </div>
 
-            <h3>Concepts</h3>
+            <h4>Concepts</h4>
 
             <div class="table-wrapper">
               <table>
@@ -1327,7 +1331,7 @@
               <li>And 40-60% context utilization for "smart zone"</li>
               <li>
                 Tight tasks + 1 task per loop =
-                <strong>100% smart zone context utilization</strong>
+                <em>100% smart zone context utilization</em>
               </li>
             </ul>
 
@@ -1335,23 +1339,27 @@
 
             <ul>
               <li>
-                <strong>Use the main agent/context as a scheduler</strong> –
-                Don't allocate expensive work to main context; spawn subagents
-                whenever possible instead
+                <em>Use the main agent/context as a scheduler</em>
+                <ul><li>Don't allocate expensive work to main context; spawn subagents
+                whenever possible instead</li></ul>
               </li>
               <li>
-                <strong>Use subagents as memory extension</strong> – Each
-                subagent gets ~156kb that's garbage collected. Fan out to avoid
-                polluting main context
+                <em>Use subagents as memory extension</em>
+                <ul>
+                  <li>Each subagent gets ~156kb that's garbage collected</li>
+                  <li>Fan out to avoid polluting main context</li>
+                </ul>
               </li>
               <li>
-                <strong>Simplicity and brevity win</strong> – Applies to number
-                of parts in system, loop config, and content. Verbose inputs
-                degrade determinism
+                <em>Simplicity and brevity win</em>
+                <ul>
+                  <li>Applies to number of parts in system, loop config, and content</li>
+                  <li>Verbose inputs degrade determinism</li>
+                </ul>
               </li>
               <li>
-                <strong>Prefer Markdown over JSON</strong> – To define and track
-                work, for better token efficiency
+                <em>Prefer Markdown over JSON</em>
+                <ul><li>To define and track work, for better token efficiency</li></ul>
               </li>
             </ul>
 
@@ -1366,59 +1374,55 @@
               directions:
             </p>
 
-            <h5>Steer upstream</h5>
             <ul>
               <li>
-                Ensure deterministic setup:
+                <em>Steer upstream</em>
                 <ul>
-                  <li>Allocate first ~5,000 tokens for specs</li>
+                  <li>Ensure deterministic setup:
+                    <ul>
+                      <li>Allocate first ~5,000 tokens for specs</li>
+                      <li>
+                        Every loop's context is allocated with the same files so
+                        model starts from known state (<code>PROMPT.md</code> +
+                        <code>AGENTS.md</code>)
+                      </li>
+                    </ul>
+                  </li>
+                  <li>Your existing code shapes what gets used and generated</li>
                   <li>
-                    Every loop's context is allocated with the same files so
-                    model starts from known state (<code>PROMPT.md</code> +
-                    <code>AGENTS.md</code>)
+                    If Ralph is generating wrong patterns, add/update utilities and
+                    existing code patterns to steer it toward correct ones
                   </li>
                 </ul>
               </li>
-              <li>Your existing code shapes what gets used and generated</li>
               <li>
-                If Ralph is generating wrong patterns, add/update utilities and
-                existing code patterns to steer it toward correct ones
+                <em>Steer downstream</em>
+                <ul>
+                  <li>Create backpressure via tests, typechecks, lints, builds, etc. that will reject invalid/unacceptable work</li>
+                  <li>
+                    Prompt says "run tests" generically.
+                    <code>AGENTS.md</code> specifies actual commands to make
+                    backpressure project-specific
+                  </li>
+                  <li>
+                    Backpressure can extend beyond code validation: some acceptance
+                    criteria resist programmatic checks - creative quality,
+                    aesthetics, UX feel. LLM-as-judge tests can provide backpressure
+                    for subjective criteria with binary pass/fail. (<a
+                      href="#non-deterministic-backpressure"
+                      >More detailed thoughts below</a
+                    >
+                    on how to approach this with Ralph.)
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <em>Remind Ralph to create/use backpressure</em>
+                <ul>
+                  <li>Remind Ralph to use backpressure when implementing: "Important: When authoring documentation, capture the why &#8212; tests and implementation importance."</li>
+                </ul>
               </li>
             </ul>
-
-            <h5>Steer downstream</h5>
-            <ul>
-              <li>Create backpressure to reject invalid work</li>
-              <li>
-                Wire in whatever validates your code: tests, typechecks, lints,
-                builds, etc.
-              </li>
-              <li>
-                Prompt says "run tests" generically.
-                <code>AGENTS.md</code> specifies actual commands to make
-                backpressure project-specific
-              </li>
-              <li>
-                Backpressure can extend beyond code validation: some acceptance
-                criteria resist programmatic checks - creative quality,
-                aesthetics, UX feel. LLM-as-judge tests can provide backpressure
-                for subjective criteria with binary pass/fail. (<a
-                  href="#non-deterministic-backpressure"
-                  >More detailed thoughts below</a
-                >
-                on how to approach this with Ralph.)
-              </li>
-            </ul>
-
-            <div class="callout callout-note">
-              <div class="callout-title">
-                Remind Ralph in Prompt.md to use backpressure:
-              </div>
-              <p>
-                "Important: When authoring documentation, capture the why -
-                tests and implementation importance."
-              </p>
-            </div>
 
             <h3><span class="section-icon">🙏</span> Let Ralph Ralph</h3>
 
@@ -1427,59 +1431,56 @@
               right thing (eventually) and engender its ability to do so.
             </p>
 
-            <h5>Let Ralph Ralph</h5>
             <ul>
               <li>
-                Lean into LLM's ability to self-identify, self-correct and
-                self-improve.
-              </li>
-              <li>
-                Applies to implementation plan, task definition and
-                prioritization.
-              </li>
-              <li>Eventual consistency achieved through iteration.</li>
-            </ul>
-
-            <h5>
-              Use Protection (<span style="color: var(--color-danger-border)"
-                >Really</span
-              >)
-            </h5>
-            <ul>
-              <li>
-                To operate autonomously, Ralph requires
-                <code>--dangerously-skip-permissions</code> - asking for
-                approval on every tool call would break the loop. This bypasses
-                Claude's permission system entirely - so a sandbox becomes your
-                only security boundary.
-              </li>
-              <li>
-                <em>Philosophy</em> - "It's not if it gets popped, it's when.
-                And what is the blast radius?"
-              </li>
-              <li>
-                Running without a sandbox exposes credentials, browser cookies,
-                SSH keys, and access tokens on your machine.
-              </li>
-              <li>
-                Run in isolated environments with minimum viable access:
+                <em>Let Ralph Ralph</em>
                 <ul>
-                  <li>Only the API keys and deploy keys needed for the task</li>
-                  <li>No access to private data beyond requirements</li>
-                  <li>Restrict network connectivity where possible</li>
+                  <li>Lean into LLM's ability to self-identify, self-correct and
+                  self-improve</li>
+                  <li>Applies to implementation plan, task definition and
+                  prioritization</li>
+                  <li>Eventual consistency achieved through iteration</li>
                 </ul>
               </li>
               <li>
-                <em>Options</em> - Docker sandboxes (local), Fly
-                Sprites/E2B/etc. (remote/production).
-                <a href="references/sandbox-environments.md"
-                  >Additional notes on options.</a
-                >
-              </li>
-              <li>
-                <em>Additional escape hatches</em> - Ctrl+C stops the loop;
-                <code>git reset --hard</code> reverts uncommitted changes;
-                regenerate plan if trajectory goes wrong.
+                <em>Use protection</em>
+                <ul>
+                  <li>
+                    To operate autonomously, Ralph requires
+                    <code>--dangerously-skip-permissions</code> - asking for
+                    approval on every tool call would break the loop. This bypasses
+                    Claude's permission system entirely - so a sandbox becomes your
+                    only security boundary.
+                  </li>
+                  <li>
+                    Philosophy: "It's not if it gets popped, it's when.
+                    And what is the blast radius?"
+                  </li>
+                  <li>
+                    Running without a sandbox exposes credentials, browser cookies,
+                    SSH keys, and access tokens on your machine
+                  </li>
+                  <li>
+                    Run in isolated environments with minimum viable access:
+                    <ul>
+                      <li>Only the API keys and deploy keys needed for the task</li>
+                      <li>No access to private data beyond requirements</li>
+                      <li>Restrict network connectivity where possible</li>
+                    </ul>
+                  </li>
+                  <li>
+                    Options: Docker sandboxes (local), Fly
+                    Sprites/E2B/etc. (remote/production) -
+                    <a href="references/sandbox-environments.md"
+                      >additional notes</a
+                    >
+                  </li>
+                  <li>
+                    Additional escape hatches: Ctrl+C stops the loop;
+                    <code>git reset --hard</code> reverts uncommitted changes;
+                    regenerate plan if trajectory goes wrong
+                  </li>
+                </ul>
               </li>
             </ul>
 
@@ -1489,20 +1490,20 @@
               To get the most out of Ralph, you need to get out of his way.
               Ralph should be doing <em>all</em> of the work, including decided
               which planned work to implement next and how to implement it. Your
-              job is now to sit on the loop, not in it – to engineer the setup
+              job is now to sit on the loop, not in it - to engineer the setup
               and environment that will allow Ralph to succeed.
             </p>
 
             <p>
-              <strong>Observe and course correct</strong> – especially early on,
+              <em>Observe and course correct</em> – especially early on,
               sit and watch. What patterns emerge? Where does Ralph go wrong?
               What signs does he need? The prompts you start with won't be the
-              prompts you end with – they evolve through observed failure
+              prompts you end with - they evolve through observed failure
               patterns.
             </p>
 
             <p>
-              <strong>Tune it like a guitar</strong> – instead of prescribing
+              <em>Tune it like a guitar</em> – instead of prescribing
               everything upfront, observe and adjust reactively. When Ralph
               fails a specific way, add a sign to help him next time.
             </p>
@@ -1513,15 +1514,15 @@
             </p>
             <ul>
               <li>
-                <strong>Prompt guardrails</strong> – explicit instructions like
+                Prompt guardrails - explicit instructions like
                 "don't assume not implemented"
               </li>
               <li>
-                <strong><code>AGENTS .md</code></strong> – operational learnings
+                <code>AGENTS.md</code> - operational learnings
                 about how to build/test
               </li>
               <li>
-                <strong>Utilities in your codebase</strong> – when you add a
+                Utilities in your codebase - when you add a
                 pattern, Ralph discovers it and follows it
               </li>
               <li>Other discoverable, relevant inputs…</li>
@@ -1548,7 +1549,7 @@
               </ol>
             </div>
 
-            <p><strong>And remember, <em>the plan is disposable:</em></strong></p>
+            <p>And remember, <em>the plan is disposable:</em></p>
             <ul>
               <li>If it's wrong, throw it out, and start over</li>
               <li>
@@ -1584,9 +1585,13 @@
             </p>
             <!-- /HTML-ONLY -->
 
-            <h3><span class="section-icon">🔄</span> Task Selection</h3>
+            <h3>I. Task Selection</h3>
 
-            <p>Geoff's initial minimal form of `loop.sh` script:</p>
+            <p>
+              <code>loop.sh</code> acts in effect as an 'outer loop' where each loop = a single task (in separate sessions). When the task is completed, <code>loop.sh</code> kicks off a fresh session to select the next task, if any remaining tasks are available.
+            </p>
+
+            <p>Geoff's initial minimal form of <code>loop.sh</code> script:</p>
 
             <div class="code-block">
               <div class="code-block-header">
@@ -1611,7 +1616,7 @@
               </li>
               <li>
                 <strong>PROMPT.md instructs</strong> → "Study
-                IMPLEMENTATION_PLAN.md and choose the most important thing"
+                IMPLEMENTATION_PLAN.md and choose the most important thing..."
               </li>
               <li>
                 <strong>Agent completes one task</strong> → updates
@@ -1623,7 +1628,7 @@
               </li>
               <li>
                 <strong>Agent reads updated plan</strong> → picks next most
-                important thing
+                important thing...
               </li>
             </ol>
 
@@ -1636,14 +1641,23 @@
                 files (<code>PROMPT.md</code> + <code>AGENTS.md</code> +
                 <code>specs/*</code>) and reads the current state from disk.
               </p>
-              <p>
-                No sophisticated orchestration needed – just a dumb bash loop
-                that keeps restarting the agent, and the agent figures out what
-                to do next by reading the plan file each time.
-              </p>
             </div>
 
-            <h3>Task Execution</h3>
+            <p>
+              <em>No sophisticated orchestration needed</em> - just a dumb bash loop
+              that keeps restarting the agent, and the agent figures out what
+              to do next by reading the plan file each time.
+            </p>
+
+            <h3>II. Task Execution</h3>
+
+            <p>
+              Each task is prompted to keep doing its work against backpressure (tests, etc) until it passes - creating a pseudo inner 'loop' (in single session).
+            </p>
+
+            <p>
+              This inner loop is just internal self-correction / iterative reasoning within one long model response, powered by backpressure prompts, tool use, and subagents. It's not a loop in the programming sense.
+            </p>
 
             <p>
               A single task execution has no hard technical limit. Control
@@ -1651,45 +1665,44 @@
             </p>
             <ul>
               <li>
-                <strong>Scope discipline</strong> – PROMPT.md instructs "one
+                <em>Scope discipline</em> - PROMPT.md instructs "one
                 task" and "commit when tests pass"
               </li>
               <li>
-                <strong>Backpressure</strong> – tests/build failures force the
+                <em>Backpressure</em> - tests/build failures force the
                 agent to fix issues before committing
               </li>
               <li>
-                <strong>Natural completion</strong> – agent exits after
+                <em>Natural completion</em> - agent exits after
                 successful commit
               </li>
             </ul>
 
             <p>
-              <strong
+              <em
                 >Ralph can go in circles, ignore instructions, or take wrong
-                directions</strong
+                directions</em
               >
-              – this is expected and part of the tuning process. When Ralph
+              - this is expected and part of the tuning process. When Ralph
               "tests you" by failing in specific ways, you add guardrails to the
               prompt or adjust backpressure mechanisms. The nondeterminism is
               manageable through observation and iteration.
             </p>
 
-            <h3>Enhanced Loop Code Example</h3>
+            <h3>Enhanced <code>loop.sh</code> Example</h3>
 
             <p>
-              Wraps core loop with mode selection (plan/build), max-iterations
-              support, and git push after each iteration.
+              Wraps core loop with mode selection (plan/build), with max-iterations for max number of tasks to complete, and git push after each iteration.
             </p>
 
             <p><em>This enhancement uses two saved prompt files:</em></p>
             <ul>
               <li>
-                <code>PROMPT_plan.md</code> – Planning mode (gap analysis,
+                <code>PROMPT_plan.md</code> - Planning mode (gap analysis,
                 generates/updates plan)
               </li>
               <li>
-                <code>PROMPT_build.md</code> – Building mode (implements from
+                <code>PROMPT_build.md</code> - Building mode (implements from
                 plan)
               </li>
             </ul>
@@ -1705,10 +1718,11 @@
                     </button>
                   </div>
                   <pre><code><span class="token-comment">#!/bin/bash</span>
-<span class="token-comment"># Usage: ./loop.sh [plan] [max_iterations]</span>
+<span class="token-comment"># Usage: ./loop.sh [plan|build] [max_iterations]</span>
 <span class="token-comment"># Examples:</span>
 <span class="token-comment">#   ./loop.sh              # Build mode, unlimited tasks</span>
 <span class="token-comment">#   ./loop.sh 20           # Build mode, max 20 tasks</span>
+<span class="token-comment">#   ./loop.sh build 20     # Build mode, max 20 tasks</span>
 <span class="token-comment">#   ./loop.sh plan         # Plan mode, unlimited tasks</span>
 <span class="token-comment">#   ./loop.sh plan 5       # Plan mode, max 5 tasks</span>
 
@@ -1718,13 +1732,18 @@
     MODE=<span class="token-string">"plan"</span>
     PROMPT_FILE=<span class="token-string">"PROMPT_plan.md"</span>
     MAX_ITERATIONS=<span class="token-variable">${2:-0}</span>
+<span class="token-keyword">elif</span> [ <span class="token-string">"$1"</span> = <span class="token-string">"build"</span> ]; <span class="token-keyword">then</span>
+    <span class="token-comment"># Explicit build mode</span>
+    MODE=<span class="token-string">"build"</span>
+    PROMPT_FILE=<span class="token-string">"PROMPT_build.md"</span>
+    MAX_ITERATIONS=<span class="token-variable">${2:-0}</span>
 <span class="token-keyword">elif</span> [[ <span class="token-string">"$1"</span> =~ ^[0-9]+$ ]]; <span class="token-keyword">then</span>
-    <span class="token-comment"># Build mode with max tasks</span>
+    <span class="token-comment"># Build mode with max tasks (bare number)</span>
     MODE=<span class="token-string">"build"</span>
     PROMPT_FILE=<span class="token-string">"PROMPT_build.md"</span>
     MAX_ITERATIONS=$1
 <span class="token-keyword">else</span>
-    <span class="token-comment"># Build mode, unlimited</span>
+    <span class="token-comment"># Build mode, unlimited (no arguments or invalid input)</span>
     MODE=<span class="token-string">"build"</span>
     PROMPT_FILE=<span class="token-string">"PROMPT_build.md"</span>
     MAX_ITERATIONS=0
@@ -1737,7 +1756,7 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
 <span class="token-function">echo</span> <span class="token-string">"Mode:   $MODE"</span>
 <span class="token-function">echo</span> <span class="token-string">"Prompt: $PROMPT_FILE"</span>
 <span class="token-function">echo</span> <span class="token-string">"Branch: $CURRENT_BRANCH"</span>
-[ $MAX_ITERATIONS -gt 0 ] && <span class="token-function">echo</span> <span class="token-string">"Max:    $MAX_ITERATIONS iterations"</span>
+[ $MAX_ITERATIONS -gt 0 ] && <span class="token-function">echo</span> <span class="token-string">"Max:    $MAX_ITERATIONS iterations (number of tasks)"</span>
 <span class="token-function">echo</span> <span class="token-string">"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"</span>
 
 <span class="token-comment"># Verify prompt file exists</span>
@@ -1748,7 +1767,7 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
 
 <span class="token-keyword">while</span> true; <span class="token-keyword">do</span>
     <span class="token-keyword">if</span> [ $MAX_ITERATIONS -gt 0 ] && [ $ITERATION -ge $MAX_ITERATIONS ]; <span class="token-keyword">then</span>
-        <span class="token-function">echo</span> <span class="token-string">"Reached max iterations: $MAX_ITERATIONS"</span>
+        <span class="token-function">echo</span> <span class="token-string">"Reached max iterations (number of tasks): $MAX_ITERATIONS"</span>
         <span class="token-keyword">break</span>
     <span class="token-keyword">fi</span>
 
@@ -1778,7 +1797,7 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
               </div>
             </details>
 
-            <h4>Mode Selection</h4>
+            <h4>Mode selection:</h4>
             <ul>
               <li>
                 No keyword → Uses <code>PROMPT_build.md</code> for building
@@ -1790,7 +1809,7 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
               </li>
             </ul>
 
-            <h4>Max-Iterations</h4>
+            <h4>Max-iterations:</h4>
             <ul>
               <li>
                 Limits the task selection loop (number of tasks attempted; NOT
@@ -1804,11 +1823,11 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
                 <code>./loop.sh</code> runs unlimited (manual stop with Ctrl+C)
               </li>
               <li>
-                <code>./loop.sh 20</code> runs max 20 tasks then stops
+                <code>./loop.sh 20</code> runs max 20 iterations then stops
               </li>
             </ul>
 
-            <h4>Claude CLI Flags Explained</h4>
+            <h4>Claude CLI flags:</h4>
             <ul>
               <li>
                 <code>-p</code> (headless mode): Enables non-interactive
@@ -1951,7 +1970,7 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
             <!-- /HTML-ONLY -->
 
             <h3><code>loop.sh</code></h3>
-            <p>The task selection loop script that orchestrates Ralph iterations.</p>
+            <p>The primary loop script that orchestrates Ralph iterations.</p>
             <p>
               See <a href="#loop-mechanics">Loop Mechanics</a> section for
               detailed implementation examples and configuration options.
@@ -1965,7 +1984,7 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
               <pre><code>chmod +x loop.sh</code></pre>
             </div>
             <p>
-              <em>Core function:</em> Continuously feeds prompt file to claude,
+              <em>Core function:</em> Continuously feeds prompt file to Claude,
               manages iteration limits, and pushes changes after each task
               completion.
             </p>
@@ -1989,15 +2008,15 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Phase 0 (0a, 0b, 0c)</td>
+                    <td><em>Phase 0</em> (0a, 0b, 0c)</td>
                     <td>Orient: study specs, source location, current plan</td>
                   </tr>
                   <tr>
-                    <td>Phase 1-4</td>
+                    <td><em>Phase 1-4</em></td>
                     <td>Main instructions: task, validation, commit</td>
                   </tr>
                   <tr>
-                    <td>999... numbering</td>
+                    <td><em>999... numbering</em></td>
                     <td>
                       Guardrails/invariants (higher number = more critical)
                     </td>
@@ -2006,11 +2025,11 @@ CURRENT_BRANCH=$(<span class="token-function">git branch --show-current</span>)
               </table>
             </div>
 
-            <h4>Key Language Patterns (Geoff's specific phrasing)</h4>
+            <h5>Key Language Patterns (Geoff's specific phrasing):</h5>
             <ul>
               <li>"study" (not "read" or "look at")</li>
               <li>
-                "don't assume not implemented" (critical – the Achilles' heel)
+                "don't assume not implemented" (critical - the Achilles' heel)
               </li>
               <li>"using parallel subagents" / "up to N subagents"</li>
               <li>"only 1 subagent for build/tests" (backpressure control)</li>
@@ -2055,6 +2074,8 @@ ULTIMATE GOAL: We want to achieve [project-specific goal]. Consider missing elem
               </div>
             </details>
 
+            <p><em>Note:</em> Current subagents names presume using Claude.</p>
+
             <details>
               <summary>PROMPT_build.md Template</summary>
               <div class="details-content">
@@ -2074,11 +2095,11 @@ ULTIMATE GOAL: We want to achieve [project-specific goal]. Consider missing elem
 3. When you discover issues, immediately update @IMPLEMENTATION_PLAN.md with your findings using a subagent. When resolved, update and remove the item.
 4. When the tests pass, update @IMPLEMENTATION_PLAN.md, then `git add -A` then `git commit` with a message describing the changes. After the commit, `git push`.
 
-99999. Important: When authoring documentation, capture the why – tests and implementation importance.
+99999. Important: When authoring documentation, capture the why &#8212; tests and implementation importance.
 999999. Important: Single sources of truth, no migrations/adapters. If tests unrelated to your work fail, resolve them as part of the increment.
 9999999. As soon as there are no build or test errors create a git tag. If there are no git tags start at 0.0.0 and increment patch by 1 for example 0.0.1  if 0.0.0 does not exist.
 99999999. You may add extra logging if required to debug issues.
-999999999. Keep @IMPLEMENTATION_PLAN.md current with learnings using a subagent – future work depends on this to avoid duplicating efforts. Update especially after finishing your turn.
+999999999. Keep @IMPLEMENTATION_PLAN.md current with learnings using a subagent &#8212; future work depends on this to avoid duplicating efforts. Update especially after finishing your turn.
 9999999999. When you learn something new about how to run the application, update @AGENTS.md using a subagent but keep it brief. For example if you run commands multiple times before learning the correct command then that file should be updated.
 99999999999. For any bugs you notice, resolve them or document them in @IMPLEMENTATION_PLAN.md using a subagent even if it is unrelated to the current piece of work.
 999999999999. Implement functionality completely. Placeholders and stubs waste efforts and time redoing the same work.
@@ -2092,7 +2113,7 @@ ULTIMATE GOAL: We want to achieve [project-specific goal]. Consider missing elem
             <h3><code>AGENTS.md</code></h3>
 
             <p>
-              Single, canonical "heart of the loop" – a concise, operational
+              Single, canonical "heart of the loop" - a concise, operational
               "how to run/build" guide.
             </p>
 
@@ -2111,7 +2132,7 @@ ULTIMATE GOAL: We want to achieve [project-specific goal]. Consider missing elem
             <h5>Loopback / Immediate Self-Evaluation</h5>
             <p>
               AGENTS.md should contain the project-specific commands that enable
-              loopback – the ability for Ralph to immediately evaluate his work
+              loopback - the ability for Ralph to immediately evaluate his work
               within the same loop. This includes:
             </p>
             <ul>
@@ -2163,7 +2184,7 @@ Succinct learnings about how to RUN the project:
 
             <p>
               Prioritized bullet-point list of tasks derived from gap analysis
-              (specs vs code) – generated by Ralph.
+              (specs vs code) - generated by Ralph.
             </p>
 
             <ul>
@@ -2188,7 +2209,7 @@ Succinct learnings about how to RUN the project:
             </p>
 
             <p>
-              <em>No pre-specified template</em> – let Ralph/LLM dictate and
+              <em>No pre-specified template</em> - let Ralph/LLM dictate and
               manage format that works best for it.
             </p>
 
@@ -2211,7 +2232,7 @@ Succinct learnings about how to RUN the project:
             </ul>
 
             <p>
-              <em>No pre-specified template</em> – let Ralph/LLM dictate and
+              <em>No pre-specified template</em> - let Ralph/LLM dictate and
               manage format that works best for it.
             </p>
 
@@ -2289,7 +2310,7 @@ Succinct learnings about how to RUN the project:
                   <em>Inspiration</em> -
                   <a href="https://x.com/trq212/status/2005315275026260309"
                     >Thariq's X post</a
-                  >
+                  >:
                 </p>
               </div>
             </details>
@@ -2321,19 +2342,19 @@ Succinct learnings about how to RUN the project:
                 </p>
                 <ul>
                   <li>
-                    <strong>Preventing "no cheating"</strong> – Can't claim done
+                    <em>Preventing "no cheating"</em> - Can't claim done
                     without required tests derived from acceptance criteria
                   </li>
                   <li>
-                    <strong>Enabling TDD workflow</strong> – Test requirements
+                    <em>Enabling TDD workflow</em> - Test requirements
                     known before implementation starts
                   </li>
                   <li>
-                    <strong>Improving convergence</strong> – Clear completion
+                    <em>Improving convergence</em> - Clear completion
                     signal (required tests pass) vs ambiguous ("seems done?")
                   </li>
                   <li>
-                    <strong>Maintaining determinism</strong> – Test requirements
+                    <em>Maintaining determinism</em> - Test requirements
                     in plan (known state) not emergent (probabilistic)
                   </li>
                 </ul>
@@ -2408,45 +2429,43 @@ Succinct learnings about how to RUN the project:
 
                 <h5>The Prescriptiveness Balance</h5>
 
-                <p><em>The critical distinction:</em></p>
+                <p>The critical distinction:</p>
                 <p>
-                  Acceptance criteria (in specs) = Behavioral outcomes,
-                  observable results
+                  <em>Acceptance criteria</em> (in specs) = Behavioral outcomes,
+                  observable results, what success looks like
                 </p>
                 <ul>
                   <li>
-                    ✓ "Extracts 5-10 dominant colors from any uploaded image"
+                    ✅ "Extracts 5-10 dominant colors from any uploaded image"
                   </li>
-                  <li>✓ "Processes images &lt;5MB in &lt;100ms"</li>
+                  <li>✅ "Processes images &lt;5MB in &lt;100ms"</li>
                   <li>
-                    ✓ "Handles edge cases: grayscale, single-color, transparent
+                    ✅ "Handles edge cases: grayscale, single-color, transparent
                     backgrounds"
                   </li>
                 </ul>
 
                 <p>
-                  Test requirements (in plan) = Verification points derived from
+                  <em>Test requirements</em> (in plan) = Verification points derived from
                   acceptance criteria
                 </p>
                 <ul>
                   <li>
-                    ✓ "Required tests: Extract 5-10 colors, Performance
-                    &lt;100ms"
+                    ✅ "Required tests: Extract 5-10 colors, Performance
+                    &lt;100ms, Handle grayscale edge case"
                   </li>
                 </ul>
 
                 <p>
-                  Implementation approach (up to Ralph) = Technical decisions
+                  <em>Implementation approach</em> (up to Ralph) = Technical decisions about how to achieve it
                 </p>
                 <ul>
-                  <li>✗ "Use K-means clustering with 3 iterations"</li>
+                  <li>❌ "Use K-means clustering with 3 iterations and LAB color space conversion"</li>
                 </ul>
 
                 <p>
-                  <em>
-                    <strong>The key:</strong> Specify WHAT to verify (outcomes),
-                    not HOW to implement (approach).</em
-                  >
+                  The key: <em>Specify WHAT to verify (outcomes),
+                    not HOW to implement (approach)</em>
                 </p>
 
                 <p>
@@ -2556,25 +2575,29 @@ Phase 3: Building (implements with tests)
                 <p>Some acceptance criteria resist programmatic validation:</p>
                 <ul>
                   <li>
-                    <strong>Creative quality</strong> – Writing tone, narrative
+                    <em>Creative quality</em> - Writing tone, narrative
                     flow, engagement
                   </li>
                   <li>
-                    <strong>Aesthetic judgments</strong> – Visual harmony,
+                    <em>Aesthetic judgments</em> - Visual harmony,
                     design balance, brand consistency
                   </li>
                   <li>
-                    <strong>UX quality</strong> – Intuitive navigation, clear
+                    <em>UX quality</em> - Intuitive navigation, clear
                     information hierarchy
                   </li>
                   <li>
-                    <strong>Content appropriateness</strong> – Context-aware
+                    <em>Content appropriateness</em> - Context-aware
                     messaging, audience fit
                   </li>
                 </ul>
 
                 <p>
-                  <strong>Solution:</strong> Add LLM-as-Judge tests as
+                  These require human-like judgment but need backpressure to meet acceptance criteria during building loop.
+                </p>
+
+                <p>
+                  <em>Solution:</em> Add LLM-as-Judge tests as
                   backpressure with binary pass/fail.
                 </p>
 
@@ -2583,7 +2606,7 @@ Phase 3: Building (implements with tests)
                   different judgments across runs). This aligns with Ralph
                   philosophy: "deterministically bad in an undeterministic
                   world." The loop provides eventual consistency through
-                  iteration–reviews run until pass, accepting natural variance.
+                  iteration&#8212;reviews run until pass, accepting natural variance.
                 </p>
 
                 <h5>What Needs to Be Created (First Step)</h5>
@@ -2614,15 +2637,15 @@ Phase 3: Building (implements with tests)
 }
 
 function createReview(config: {
-  criteria: string;    // What to evaluate
-  artifact: string;    // Text content OR screenshot path
-  intelligence?: "fast" | "smart";
+  criteria: string; // What to evaluate (behavioral, observable)
+  artifact: string; // Text content OR screenshot path
+  intelligence?: "fast" | "smart"; // Optional, defaults to 'fast'
 }): Promise&lt;ReviewResult&gt;;</code></pre>
                 </div>
 
                 <p>
-                  <strong>Multimodal support:</strong> Both intelligence levels
-                  use multimodal models (text + vision). Artifact type detection
+                  <em>Multimodal support:</em> Both intelligence levels
+                  would use multimodal model (text + vision). Artifact type detection
                   is automatic:
                 </p>
                 <ul>
@@ -2639,17 +2662,19 @@ function createReview(config: {
                 </ul>
 
                 <p>
-                  <strong>Intelligence levels</strong> (quality of judgment, not
+                  <em>Intelligence levels</em> (quality of judgment, not
                   capability type):
                 </p>
                 <ul>
                   <li>
                     <code>fast</code> (default): Quick, cost-effective models
-                    for straightforward evaluations (e.g., Gemini 3.0 Flash)
+                    for straightforward evaluations
+                    <ul><li>Example: Gemini 3.0 Flash (multimodal, fast, cheap)</li></ul>
                   </li>
                   <li>
                     <code>smart</code>: Higher-quality models for nuanced
-                    aesthetic/creative judgment (e.g., GPT 5.1)
+                    aesthetic/creative judgment
+                    <ul><li>Example: GPT 5.1 (multimodal, better judgment, higher cost)</li></ul>
                   </li>
                 </ul>
                 <p>
@@ -2720,9 +2745,16 @@ test("brand visual consistency", async () =&gt; {
                   <em>Planning Phase</em> - Update <code>PROMPT_plan.md</code>:
                 </p>
                 <p>
-                  After "...Study @IMPLEMENTATION_PLAN.md to determine starting
-                  point for research and keep it up to date with items
-                  considered complete/incomplete using subagents." insert:
+                  After:
+                </p>
+                <div class="code-block">
+                  <div class="code-block-header">
+                    <span>instruction</span>
+                  </div>
+                  <pre><code>...Study @IMPLEMENTATION_PLAN.md to determine starting point for research and keep it up to date with items considered complete/incomplete using subagents.</code></pre>
+                </div>
+                <p>
+                  Insert this:
                 </p>
                 <div class="code-block">
                   <div class="code-block-header">
@@ -2772,7 +2804,7 @@ test("brand visual consistency", async () =&gt; {
                         <td>⚠️ Partial</td>
                         <td>
                           Criteria in plan (deterministic), evaluation
-                          non-deterministic but converges through iteration
+                          non-deterministic but converges through iteration. Intentional tradeoff for subjective quality.
                         </td>
                       </tr>
                       <tr>
@@ -2828,43 +2860,45 @@ test("brand visual consistency", async () =&gt; {
               </summary>
               <div class="details-content">
                 <p>
-                  <strong>The Critical Principle:</strong> Geoff's Ralph works
+                  <em>The Critical Principle:</em> Geoff's Ralph works
                   from a single, disposable plan where Ralph picks "most
                   important." To use branches with Ralph while maintaining this
                   pattern, you must scope at plan creation, not at task
                   selection.
                 </p>
 
+                <p><em>Why this matters:</em></p>
+
                 <ul>
                   <li>
-                    ❌ &nbsp;<em> Wrong Approach:</em> Create full plan, then
+                    ❌ <em>Wrong approach</em>: Create full plan, then
                     ask Ralph to "filter" tasks at runtime → unreliable
                     (70-80%), violates determinism
                   </li>
                   <li>
-                    ✓ &nbsp;<em>Right Approach:</em> Create a scoped plan
+                    ✅ <em>Right approach</em>: Create a scoped plan
                     upfront for each work branch → deterministic, simple,
                     maintains "plan is disposable"
                   </li>
                 </ul>
 
                 <p>
-                  <strong>Solution:</strong> Add a <code>plan-work</code> mode
+                  <em>Solution:</em> Add a <code>plan-work</code> mode
                   to create a work-scoped <code>IMPLEMENTATION_PLAN.md</code> on
                   the current branch. User creates work branch, then runs
                   <code>plan-work</code> with a natural language description of
                   the work focus. The LLM uses this description to scope the
                   plan. Post planning, Ralph builds from this already-scoped
-                  plan with zero semantic filtering – just picks "most
+                  plan with zero semantic filtering - just picks "most
                   important" as always.
                 </p>
 
                 <p>
-                  "Work" is intentionally a broad term – it can describe
+                  <em>Terminology:</em> "Work" is intentionally broad - it can describe
                   features, topics of concern, refactoring efforts,
                   infrastructure changes, bug fixes, or any coherent body of
                   related changes. The work description you pass to
-                  <code>plan-work</code> is natural language for the LLM – it
+                  <code>plan-work</code> is natural language for the LLM - it
                   can be prose, not constrained by git branch naming rules.
                 </p>
 
@@ -2962,12 +2996,12 @@ test("brand visual consistency", async () =&gt; {
                         <span>bash</span>
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                       </div>
-                      <pre><code>gh pr create --base main --head ralph/user-auth --fill</code></pre>
+                      <pre><code>gh pr create --base main --head ralph/user-auth-oauth --fill</code></pre>
                     </div>
                   </li>
                 </ol>
 
-                <h5>Work-Scoped <code>loop.sh</code></h5>
+                <h5>Work-Scoped Loop Script</h5>
                 <p>
                   Extends the base enhanced loop script to add work branch
                   support with scoped planning:
@@ -2981,8 +3015,8 @@ test("brand visual consistency", async () =&gt; {
 set -euo pipefail
 
 # Usage:
-#   ./loop.sh [plan] [max_iterations]       # Plan/build on current branch
-#   ./loop.sh plan-work "work description"  # Create scoped plan on current branch
+#   ./loop.sh [plan|build] [max_iterations]  # Plan/build on current branch
+#   ./loop.sh plan-work "work description"   # Create scoped plan on current branch
 
 # Parse arguments
 MODE="build"
@@ -2991,6 +3025,8 @@ PROMPT_FILE="PROMPT_build.md"
 if [ "$1" = "plan" ]; then
     MODE="plan"
     PROMPT_FILE="PROMPT_plan.md"
+    MAX_ITERATIONS=${2:-0}
+elif [ "$1" = "build" ]; then
     MAX_ITERATIONS=${2:-0}
 elif [ "$1" = "plan-work" ]; then
     if [ -z "$2" ]; then
@@ -3002,12 +3038,109 @@ elif [ "$1" = "plan-work" ]; then
     PROMPT_FILE="PROMPT_plan_work.md"
     MAX_ITERATIONS=${3:-5}
 elif [[ "$1" =~ ^[0-9]+$ ]]; then
+    # Build mode with max iterations
     MAX_ITERATIONS=$1
 else
+    # Build mode, unlimited
     MAX_ITERATIONS=0
 fi
 
-# ... (see README for full script)</code></pre>
+ITERATION=0
+CURRENT_BRANCH=$(git branch --show-current)
+
+# Validate branch for plan-work mode
+if [ "$MODE" = "plan-work" ]; then
+    if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
+        echo "Error: plan-work should be run on a work branch, not main/master"
+        echo "Create a work branch first: git checkout -b ralph/your-work"
+        exit 1
+    fi
+
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Mode:    plan-work"
+    echo "Branch:  $CURRENT_BRANCH"
+    echo "Work:    $WORK_DESCRIPTION"
+    echo "Prompt:  $PROMPT_FILE"
+    echo "Plan:    Will create scoped IMPLEMENTATION_PLAN.md"
+    [ "$MAX_ITERATIONS" -gt 0 ] &amp;&amp; echo "Max:     $MAX_ITERATIONS iterations"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    # Warn about uncommitted changes to IMPLEMENTATION_PLAN.md
+    if [ -f "IMPLEMENTATION_PLAN.md" ] &amp;&amp; ! git diff --quiet IMPLEMENTATION_PLAN.md 2&gt;/dev/null; then
+        echo "Warning: IMPLEMENTATION_PLAN.md has uncommitted changes that will be overwritten"
+        read -p "Continue? [y/N] " -n 1 -r
+        echo
+        [[ ! $REPLY =~ ^[Yy]$ ]] &amp;&amp; exit 1
+    fi
+
+    # Export work description for PROMPT_plan_work.md
+    export WORK_SCOPE="$WORK_DESCRIPTION"
+else
+    # Normal plan/build mode
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Mode:   $MODE"
+    echo "Branch: $CURRENT_BRANCH"
+    echo "Prompt: $PROMPT_FILE"
+    echo "Plan:   IMPLEMENTATION_PLAN.md"
+    [ "$MAX_ITERATIONS" -gt 0 ] &amp;&amp; echo "Max:    $MAX_ITERATIONS iterations"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+fi
+
+# Verify prompt file exists
+if [ ! -f "$PROMPT_FILE" ]; then
+    echo "Error: $PROMPT_FILE not found"
+    exit 1
+fi
+
+# Main loop
+while true; do
+    if [ "$MAX_ITERATIONS" -gt 0 ] &amp;&amp; [ "$ITERATION" -ge "$MAX_ITERATIONS" ]; then
+        echo "Reached max iterations: $MAX_ITERATIONS"
+
+        if [ "$MODE" = "plan-work" ]; then
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Scoped plan created: $WORK_DESCRIPTION"
+            echo "To build, run:"
+            echo "  ./loop.sh 20"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        fi
+        break
+    fi
+
+    # Run Ralph iteration with selected prompt
+    # -p: Headless mode (non-interactive, reads from stdin)
+    # --dangerously-skip-permissions: Auto-approve all tool calls (YOLO mode)
+    # --output-format=stream-json: Structured output for logging/monitoring
+    # --model opus: Primary agent uses Opus for complex reasoning (task selection, prioritization)
+    #               Can use 'sonnet' for speed if plan is clear and tasks well-defined
+    # --verbose: Detailed execution logging
+
+    # For plan-work mode, substitute ${WORK_SCOPE} in prompt before piping
+    if [ "$MODE" = "plan-work" ]; then
+        envsubst &lt; "$PROMPT_FILE" | claude -p \
+            --dangerously-skip-permissions \
+            --output-format=stream-json \
+            --model opus \
+            --verbose
+    else
+        cat "$PROMPT_FILE" | claude -p \
+            --dangerously-skip-permissions \
+            --output-format=stream-json \
+            --model opus \
+            --verbose
+    fi
+
+    # Push to current branch
+    CURRENT_BRANCH=$(git branch --show-current)
+    git push origin "$CURRENT_BRANCH" || {
+        echo "Failed to push. Creating remote branch..."
+        git push -u origin "$CURRENT_BRANCH"
+    }
+
+    ITERATION=$((ITERATION + 1))
+    echo -e "\n\n======================== LOOP $ITERATION ========================\n"
+done</code></pre>
                 </div>
 
                 <h5><code>PROMPT_plan_work.md</code> Template</h5>
@@ -3066,7 +3199,7 @@ ULTIMATE GOAL: We want to achieve the scoped work "${WORK_SCOPE}". Consider miss
                         <td>Deterministic</td>
                         <td>✅ Yes</td>
                         <td>
-                          Scoping at plan creation (deterministic), not runtime
+                          Scoping at plan creation (deterministic), not runtime (prob.)
                         </td>
                       </tr>
                       <tr>
@@ -3133,8 +3266,8 @@ ULTIMATE GOAL: We want to achieve the scoped work "${WORK_SCOPE}". Consider miss
                     href="https://ghuntley.com/content/images/size/w2400/2025/07/The-ralph-Process.png"
                     >suggested workflow</a
                   >
-                  already aligns planning with Jobs-to-be-Done – breaking JTBDs
-                  into topics of concern, which in turn become specs. I think
+                  already aligns planning with Jobs-to-be-Done &#8212; breaking JTBDs
+                  into topics of concern, which in turn become specs. I love this and I think
                   there's an opportunity to lean further into the product
                   benefits this approach affords by reframing
                   <em>topics of concern</em> as <em>activities</em>.
@@ -3156,14 +3289,14 @@ ULTIMATE GOAL: We want to achieve the scoped work "${WORK_SCOPE}". Consider miss
                 </blockquote>
                 <h5>Activities → User Journey</h5>
                 <p>
-                  Activities – and their constituent steps – sequence naturally
+                  Activities &#8212; and their constituent steps &#8212; sequence naturally
                   into a user flow, creating a <em>journey structure</em> that
                   makes gaps and dependencies visible. A
                   <a href="https://www.nngroup.com/articles/user-story-mapping/"
                     >User Story Map</a
                   >
                   organizes activities as columns (the journey backbone) with
-                  capability depths as rows – the full space of what
+                  capability depths as rows &#8212; the full space of what
                   <em>could</em> be built:
                 </p>
                 <div class="code-block">
@@ -3210,22 +3343,22 @@ Release 3:    batch         AI themes      templates       embed</code></pre>
                 </p>
                 <ul>
                   <li>
-                    <em>Simple</em> – Narrow scope you can ship fast. Not every
+                    <em>Simple</em> &#8212; Narrow scope you can ship fast. Not every
                     activity, not every depth.
                   </li>
                   <li>
-                    <em>Complete</em> – Fully accomplishes a job within that
+                    <em>Complete</em> &#8212; Fully accomplishes a job within that
                     scope. Not a broken preview.
                   </li>
                   <li>
-                    <em>Lovable</em> – People actually want to use it.
+                    <em>Lovable</em> &#8212; People actually want to use it.
                     Delightful within its boundaries.
                   </li>
                 </ul>
 
                 <p>
-                  <strong>Why SLC over MVP?</strong> MVPs optimize for learning
-                  at the customer's expense – "minimum" often means broken or
+                  <em>Why SLC over MVP?</em> MVPs optimize for learning
+                  at the customer's expense &#8212; "minimum" often means broken or
                   frustrating. SLC flips this: learn in-market
                   <em>while</em> delivering real value. If it succeeds, you have
                   optionality. If it fails, you still treated users well.
@@ -3250,22 +3383,22 @@ Design Studio:   batch       AI themes      templates       embed</code></pre>
                 </div>
                 <ul>
                   <li>
-                    <em>Palette Picker</em> – Upload, extract, export. Instant
+                    <em>Palette Picker</em> &#8212; Upload, extract, export. Instant
                     value from day one.
                   </li>
                   <li>
-                    <em>Mood Board</em> – Adds arrangement. Creative expression
+                    <em>Mood Board</em> &#8212; Adds arrangement. Creative expression
                     enters the journey.
                   </li>
                   <li>
-                    <em>Design Studio</em> – Professional features: batch
+                    <em>Design Studio</em> &#8212; Professional features: batch
                     processing, AI themes, embeddable output.
                   </li>
                 </ul>
 
                 <h5>Operationalizing with Ralph</h5>
                 <p>
-                  The concepts above – activities, story maps, SLC releases –
+                  The concepts above &#8212; activities, story maps, SLC releases &#8212;
                   are the <em>thinking tools</em>. How do we translate them into
                   Ralph's workflow?
                 </p>
@@ -3302,8 +3435,8 @@ Design Studio:   batch       AI themes      templates       embed</code></pre>
                     <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                   </div>
                   <pre><code>Audience (who)
-    └── has JTBDs (why)
-            └── fulfilled by Activities (how)</code></pre>
+    └── has JTBDs (desired outcomes)
+            └── fulfilled by Activities (means to achieve outcomes)</code></pre>
                 </div>
 
                 <h5>Workflow</h5>
@@ -3314,7 +3447,7 @@ Design Studio:   batch       AI themes      templates       embed</code></pre>
                 </p>
                 <ol>
                   <li>
-                    <em>Define audience and their JTBDs</em> – WHO are we
+                    <em>Define audience and their JTBDs</em> &#8212; WHO are we
                     building for and what OUTCOMES do they want?
                     <ul>
                       <li>
@@ -3329,7 +3462,7 @@ Design Studio:   batch       AI themes      templates       embed</code></pre>
                     </ul>
                   </li>
                   <li>
-                    <em>Define activities</em> – WHAT do users do to accomplish
+                    <em>Define activities</em> &#8212; WHAT do users do to accomplish
                     their JTBDs?
                     <ul>
                       <li>Informed by <code>AUDIENCE_JTBD.md</code></li>
@@ -3341,11 +3474,11 @@ Design Studio:   batch       AI themes      templates       embed</code></pre>
                         For each activity, determine:
                         <ul>
                           <li>
-                            Capability depths (basic → enhanced) – levels of
+                            Capability depths (basic → enhanced) &#8212; levels of
                             sophistication
                           </li>
                           <li>
-                            Desired outcome(s) at each depth – what does success
+                            Desired outcome(s) at each depth &#8212; what does success
                             look like?
                           </li>
                         </ul>
@@ -3402,7 +3535,7 @@ Design Studio:   batch       AI themes      templates       embed</code></pre>
                   standard building prompt.
                 </p>
 
-                  <h5>Updated <code></code>PROMPT_plan_slc.md</code> Template</h5>
+                  <h5>Updated Planning Prompt</h5>
                     <p>
                       Variant of <code>PROMPT_plan.md</code> that adds audience
                       context and SLC-oriented slice recommendation.
@@ -3411,7 +3544,7 @@ Design Studio:   batch       AI themes      templates       embed</code></pre>
                       <em>Notes:</em>
                       <ul>
                         <li>Unlike the default template, this does not
-                      have a <code>[project-specific goal]</code> placeholder –
+                      have a <code>[project-specific goal]</code> placeholder &#8212;
                       the goal is implicit: recommend the most valuable next
                       release for the audience.
                       </li>
@@ -3452,7 +3585,7 @@ ULTIMATE GOAL: We want to achieve the most valuable next release for the audienc
                   >
                 </p>
                 <ul>
-                  <li>Single source of truth – prevents drift across specs</li>
+                  <li>Single source of truth &#8212; prevents drift across specs</li>
                   <li>
                     Enables holistic reasoning: "What does this audience need
                     MOST?"
@@ -3613,7 +3746,7 @@ ULTIMATE GOAL: We want to achieve the most valuable next release for the audienc
 
 1. Identify Jobs to Be Done (JTBD) → Break individual JTBD into topic(s) of concern → Use subagents to load info from URLs into context → LLM understands JTBD topic of concern: subagent writes specs/FILENAME.md for each topic.
 
-## RULES (dont apply to `specs/README.md`)
+## RULES (don't apply to `specs/README.md`)
 
 999. NEVER add code blocks or suggest how a variable should be named. This will be decided by Ralph.
 

@@ -160,7 +160,7 @@ Creating the right signals & gates to steer Ralph's successful output is **criti
   - If Ralph is generating wrong patterns, add/update utilities and existing code patterns to steer it toward correct ones
 - _Steer downstream_
   - Create backpressure via tests, typechecks, lints, builds, etc. that will reject invalid/unacceptable work
-  - Prompt says "run tests" generically. `AGENTS .md` specifies actual commands to make backpressure project-specific
+  - Prompt says "run tests" generically. `AGENTS.md` specifies actual commands to make backpressure project-specific
   - Backpressure can extend beyond code validation: some acceptance criteria resist programmatic checks - creative quality, aesthetics, UX feel. LLM-as-judge tests can provide backpressure for subjective criteria with binary pass/fail. ([More detailed thoughts below](#non-deterministic-backpressure) on how to approach this with Ralph.)
 - _Remind Ralph to create/use backpressure_
   - Remind Ralph to use backpressure when implementing: "Important: When authoring documentation, capture the why — tests and implementation importance."
@@ -195,7 +195,7 @@ _Tune it like a guitar_ – instead of prescribing everything upfront, observe a
 But signs aren't just prompt text. They're _anything_ Ralph can discover:
 
 - Prompt guardrails - explicit instructions like "don't assume not implemented"
-- `AGENTS .md` - operational learnings about how to build/test
+- `AGENTS.md` - operational learnings about how to build/test
 - Utilities in your codebase - when you add a pattern, Ralph discovers it and follows it
 - Other discoverable, relevant inputs…
 
@@ -272,10 +272,11 @@ _This enhancement uses two saved prompt files:_
 
 ```bash
 #!/bin/bash
-# Usage: ./loop.sh [plan] [max_iterations]
+# Usage: ./loop.sh [plan|build] [max_iterations]
 # Examples:
 #   ./loop.sh              # Build mode, unlimited tasks
 #   ./loop.sh 20           # Build mode, max 20 tasks
+#   ./loop.sh build 20     # Build mode, max 20 tasks
 #   ./loop.sh plan         # Plan mode, unlimited tasks
 #   ./loop.sh plan 5       # Plan mode, max 5 tasks
 
@@ -285,8 +286,13 @@ if [ "$1" = "plan" ]; then
     MODE="plan"
     PROMPT_FILE="PROMPT_plan.md"
     MAX_ITERATIONS=${2:-0}
+elif [ "$1" = "build" ]; then
+    # Explicit build mode (with optional max iterations)
+    MODE="build"
+    PROMPT_FILE="PROMPT_build.md"
+    MAX_ITERATIONS=${2:-0}
 elif [[ "$1" =~ ^[0-9]+$ ]]; then
-    # Build mode with max tasks
+    # Build mode with max tasks (bare number)
     MODE="build"
     PROMPT_FILE="PROMPT_build.md"
     MAX_ITERATIONS=$1
@@ -922,11 +928,12 @@ Extends the base enhanced loop script to add work branch support with scoped pla
 set -euo pipefail
 
 # Usage:
-#   ./loop.sh [plan] [max_iterations]       # Plan/build on current branch
+#   ./loop.sh [plan|build] [max_iterations]  # Plan/build on current branch
 #   ./loop.sh plan-work "work description"  # Create scoped plan on current branch
 # Examples:
 #   ./loop.sh                               # Build mode, unlimited
 #   ./loop.sh 20                            # Build mode, max 20
+#   ./loop.sh build 20                      # Build mode, max 20
 #   ./loop.sh plan 5                        # Full planning, max 5
 #   ./loop.sh plan-work "user auth"         # Scoped planning
 
@@ -938,6 +945,9 @@ if [ "$1" = "plan" ]; then
     # Full planning mode
     MODE="plan"
     PROMPT_FILE="PROMPT_plan.md"
+    MAX_ITERATIONS=${2:-0}
+elif [ "$1" = "build" ]; then
+    # Explicit build mode (with optional max iterations)
     MAX_ITERATIONS=${2:-0}
 elif [ "$1" = "plan-work" ]; then
     # Scoped planning mode
@@ -951,7 +961,7 @@ elif [ "$1" = "plan-work" ]; then
     PROMPT_FILE="PROMPT_plan_work.md"
     MAX_ITERATIONS=${3:-5}  # Default 5 for work planning
 elif [[ "$1" =~ ^[0-9]+$ ]]; then
-    # Build mode with max iterations
+    # Build mode with max iterations (bare number)
     MAX_ITERATIONS=$1
 else
     # Build mode, unlimited

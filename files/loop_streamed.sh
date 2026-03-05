@@ -1,9 +1,10 @@
 #!/bin/bash
 set -o pipefail
-# Usage: ./loop_streamed.sh [plan] [max_iterations]
+# Usage: ./loop_streamed.sh [plan|build] [max_iterations]
 # Examples:
 #   ./loop_streamed.sh              # Build mode, unlimited iterations
 #   ./loop_streamed.sh 20           # Build mode, max 20 iterations
+#   ./loop_streamed.sh build 20     # Build mode, max 20 iterations
 #   ./loop_streamed.sh plan         # Plan mode, unlimited iterations
 #   ./loop_streamed.sh plan 5       # Plan mode, max 5 iterations
 
@@ -13,8 +14,13 @@ if [ "$1" = "plan" ]; then
     MODE="plan"
     PROMPT_FILE="PROMPT_plan.md"
     MAX_ITERATIONS=${2:-0}
+elif [ "$1" = "build" ]; then
+    # Explicit build mode (with optional max iterations)
+    MODE="build"
+    PROMPT_FILE="PROMPT_build.md"
+    MAX_ITERATIONS=${2:-0}
 elif [[ "$1" =~ ^[0-9]+$ ]]; then
-    # Build mode with max iterations
+    # Build mode with max iterations (bare number)
     MODE="build"
     PROMPT_FILE="PROMPT_build.md"
     MAX_ITERATIONS=$1
