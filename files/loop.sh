@@ -1,8 +1,9 @@
 #!/bin/bash
-# Usage: ./loop.sh [plan] [max_iterations]
+# Usage: ./loop.sh [plan|build] [max_iterations]
 # Examples:
 #   ./loop.sh              # Build mode, unlimited iterations
 #   ./loop.sh 20           # Build mode, max 20 iterations
+#   ./loop.sh build 20     # Build mode, max 20 iterations
 #   ./loop.sh plan         # Plan mode, unlimited iterations
 #   ./loop.sh plan 5       # Plan mode, max 5 iterations
 
@@ -12,8 +13,13 @@ if [ "$1" = "plan" ]; then
     MODE="plan"
     PROMPT_FILE="PROMPT_plan.md"
     MAX_ITERATIONS=${2:-0}
+elif [ "$1" = "build" ]; then
+    # Explicit build mode (with optional max iterations)
+    MODE="build"
+    PROMPT_FILE="PROMPT_build.md"
+    MAX_ITERATIONS=${2:-0}
 elif [[ "$1" =~ ^[0-9]+$ ]]; then
-    # Build mode with max iterations
+    # Build mode with max iterations (bare number)
     MODE="build"
     PROMPT_FILE="PROMPT_build.md"
     MAX_ITERATIONS=$1
