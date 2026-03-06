@@ -1,5 +1,6 @@
 #!/bin/bash
 set -o pipefail
+
 # Usage: ./loop_streamed.sh [plan|build] [max_iterations]
 # Examples:
 #   ./loop_streamed.sh              # Build mode, unlimited iterations
@@ -7,6 +8,24 @@ set -o pipefail
 #   ./loop_streamed.sh build 20     # Build mode, max 20 iterations
 #   ./loop_streamed.sh plan         # Plan mode, unlimited iterations
 #   ./loop_streamed.sh plan 5       # Plan mode, max 5 iterations
+
+# Setup needed to make Ctrl-C exit this script properly
+set -m
+PIPELINE_PID=""
+stop_pipeline() {
+    if [ -n "$PIPELINE_PID" ] && kill -0 "$PIPELINE_PID" 2>/dev/null; then
+        kill -TERM -- "-$PIPELINE_PID" 2>/dev/null || kill -TERM "$PIPELINE_PID" 2>/dev/null || true
+        wait "$PIPELINE_PID" 2>/dev/null || true
+    fi
+}
+handle_interrupt() {
+    trap - INT TERM
+    echo ""
+    echo "Interrupted. Stopping loop."
+    stop_pipeline
+    exit 130
+}
+trap handle_interrupt INT TERM
 
 # Parse arguments
 if [ "$1" = "plan" ]; then
@@ -70,17 +89,24 @@ Execute the instructions above."
 
     # Stream JSON with partial messages, parse for readable output
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    claude -p "$FULL_PROMPT" \
-        --dangerously-skip-permissions \
-        --model opus \
-        --verbose \
-        --output-format stream-json \
-        --include-partial-messages | node "$SCRIPT_DIR/parse_stream.js"
+    (
+        claude -p "$FULL_PROMPT" \
+            --dangerously-skip-permissions \
+            --model opus \
+            --verbose \
+            --output-format stream-json \
+            --include-partial-messages | node "$SCRIPT_DIR/parse_stream.js"
+    ) &
 
-    if [ $? -ne 0 ]; then
+    # Wait on Claude/Node pipeline and print exit status code on exit
+    PIPELINE_PID=$!
+    wait "$PIPELINE_PID"
+    PIPELINE_STATUS=$?
+    PIPELINE_PID=""
+    if [ $PIPELINE_STATUS -ne 0 ]; then
         echo ""
-        echo "Pipeline exited with non-zero status. Stopping loop."
-        exit 1
+        echo "Pipeline exited with non-zero status ($PIPELINE_STATUS). Stopping loop."
+        exit $PIPELINE_STATUS
     fi
     
     echo ""
