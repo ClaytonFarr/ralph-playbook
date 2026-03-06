@@ -3784,6 +3784,249 @@ If you need "and" to describe what it does, it's probably multiple topics
                 </p>
               </div>
             </details>
+
+            <details>
+              <summary>
+                <span class="summary-title"
+                  >Reverse Engineering Brownfield Projects to Specs</span
+                >
+                <span class="summary-desc"
+                  >Bring brownfield codebases into Ralph's workflow by
+                  reverse-engineering existing code into specs before planning
+                  new work.</span
+                >
+              </summary>
+              <div class="details-content">
+                <p>
+                  It's easy to start working with specs in Greenfield, but when
+                  you're working in Brownfield, you have to take another
+                  approach. That's why you need to reverse engineer the
+                  implementations of the code back into specs to begin using the
+                  Ralph playbook.
+                </p>
+
+                <p>
+                  <em>When to use:</em> You inherited or joined a codebase with
+                  no specs. You want to use Ralph on a project that wasn't built
+                  with Ralph. You need to add features to an existing brownfield
+                  project.
+                </p>
+
+                <p>
+                  <em>Invoke:</em> "Reverse-engineer specs for [topic/area]
+                  using <code>PROMPT_reverse_engineer_specs.md</code>"
+                </p>
+
+                <p><em>Flow:</em></p>
+                <ol>
+                  <li>
+                    Point agent at existing codebase with
+                    <code>PROMPT_reverse_engineer_specs.md</code> →
+                  </li>
+                  <li>Agent investigates code (implementation-aware) →</li>
+                  <li>
+                    Agent writes specs describing actual behavior
+                    (implementation-free) →
+                  </li>
+                  <li>Specs land in <code>specs/</code> →</li>
+                  <li>Repeat as needed for all specs</li>
+                  <li>
+                    Proceed with normal Ralph phases (plan → build) against
+                    documented baseline
+                  </li>
+                </ol>
+
+                <p>
+                  You can use an agent orchestration pattern where the sub-agent
+                  is the reverse engineer and the orchestrator knows about the
+                  Topic of Concern Philosophy:
+                </p>
+                <ul>
+                  <li>
+                    <strong>Full domain coverage:</strong> Tell the orchestrator
+                    to identify the list of topics in the domain, then spawn
+                    sub-agents to create complete specifications for each topic.
+                  </li>
+                  <li>
+                    <strong>Task-scoped coverage:</strong> Provide a specific
+                    task you're going to perform and have the agent analyze the
+                    codebase, find the relevant topics, then create/update each
+                    respective spec.
+                  </li>
+                </ul>
+
+                <p>
+                  No modifications to existing prompt files needed — this is
+                  purely additive. The generated specs are the same format Ralph
+                  already consumes in planning and building phases.
+                </p>
+
+                <h5>Considerations</h5>
+                <ul>
+                  <li>
+                    <strong>Mono-repo structures:</strong> May require scoping
+                    the reverse-engineering to specific packages or services
+                    rather than the entire repo. Point the agent at the relevant
+                    subdirectory.
+                  </li>
+                  <li>
+                    <strong>Entire-domain specs generation:</strong> Generating
+                    specs for an entire domain is a larger investment — worth
+                    doing if your team is adopting Ralph as a standard workflow.
+                  </li>
+                  <li>
+                    <strong>Quick development or small changes:</strong> Small
+                    code changes may drift from generated specs. Decide upfront
+                    whether your team will re-run reverse-engineering to keep
+                    specs current, or accept temporary drift.
+                  </li>
+                  <li>
+                    <strong>Spec staleness after refactors:</strong> Once Ralph
+                    builds new features on top of reverse-engineered specs, major
+                    refactors can invalidate specs silently. Re-run
+                    reverse-engineering periodically on heavily changed areas.
+                  </li>
+                  <li>
+                    <strong>Topic granularity:</strong> The prompt enforces "one
+                    topic per spec" strictly. On a large codebase, deciding where
+                    to draw topic boundaries is a judgment call — too broad and
+                    specs become unwieldy, too narrow and you drown in files.
+                    Start coarse and split as needed.
+                  </li>
+                  <li>
+                    <strong>Bugs become specs:</strong> The prompt intentionally
+                    documents buggy behavior as the defined behavior.
+                    Reverse-engineered specs describe what <em>is</em>, not what
+                    <em>should be</em>. Write new specs separately for desired
+                    behavior changes.
+                  </li>
+                  <li>
+                    <strong>Token cost on large codebases:</strong> Exhaustive
+                    code tracing with sub-agents can burn significant tokens.
+                    Scope to the areas you're actually planning to modify first.
+                  </li>
+                </ul>
+
+                <h5>Compatibility with Core Philosophy</h5>
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Principle</th>
+                        <th>Maintained?</th>
+                        <th>How</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Deterministic setup</td>
+                        <td>✅ Yes</td>
+                        <td>
+                          Specs are written artifacts (known state), not ad-hoc
+                          context, contains all flaws in code.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Context efficiency</td>
+                        <td>⚠️ Partial</td>
+                        <td>
+                          Must be adopted throughout your entire team culture
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Capture the why</td>
+                        <td>⚠️ Partial</td>
+                        <td>
+                          Not all implemented code contains the why behind
+                          things, only captures comments if they express the why
+                          intention.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Let Ralph Ralph</td>
+                        <td>✅ Yes</td>
+                        <td>
+                          Topics of concern are still chosen by Ralph.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Plan is disposable</td>
+                        <td>✅ Yes</td>
+                        <td>
+                          Specs provide stable baseline; plans regenerate against
+                          documented reality
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Simplicity wins</td>
+                        <td>✅ Yes</td>
+                        <td>
+                          Provides a Hawkeye view of your entire specifications.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h5><code>PROMPT_reverse_engineer_specs.md</code> Template</h5>
+
+                <p><em>Notes:</em></p>
+                <ul>
+                  <li>
+                    Documents actual code behavior (bugs included) — not intended behavior
+                  </li>
+                  <li>
+                    Two-phase process: Phase 1 investigates with full code access, Phase 2 writes specs with zero implementation details
+                  </li>
+                  <li>
+                    One topic per spec, enforced by the "one sentence without 'and'" test
+                  </li>
+                  <li>Current subagent names presume using Claude</li>
+                </ul>
+
+                <p>
+                  <em>Files:</em>
+                  <a href="files/PROMPT_reverse_engineer_specs.md"
+                    ><code>PROMPT_reverse_engineer_specs.md</code></a
+                  >
+                </p>
+
+                <div class="code-block">
+                  <div class="code-block-header">
+                    <span>PROMPT_reverse_engineer_specs.md</span>
+                    <button class="copy-btn" onclick="copyCode(this)">
+                      Copy
+                    </button>
+                  </div>
+                  <pre><code>0a. Study `specs/*` with up to 250 parallel Sonnet subagents to learn existing specifications.
+0b. Study `src/*` to understand the codebase. Use up to 500 parallel Sonnet subagents for reads/searches. Treat `src/lib` as the project's standard library for shared utilities and components.
+
+1. For each topic assigned (or discovered), reverse-engineer the source code and produce a specification in `specs/`. Use Opus subagents for complex tracing. Ultrathink. Before writing a spec, search to confirm one doesn't already exist for that topic.
+2. One topic per spec. Must pass the "one sentence without 'and'" test. Split if "and" joins unrelated capabilities.
+3. **Two-phase process:** Phase 1 (Investigation) — trace every entry point, branch, code path to terminal. Map data flow, side effects, state mutations, error handling, concurrency, config-driven paths, implicit behavior. Phase 2 (Output) — zero implementation details. No function/class/variable names, file paths, library/framework references. A different team on a different stack must be able to reimplement from the spec alone.
+4. **Document reality, not intent.** Bugs are features. Never add behaviors the code doesn't implement. Never suggest improvements. If a source comment contradicts the code, document the code's behavior and ignore the comment.
+5. **Scope boundaries:** When tracing leaves the topic, stop. Document what crosses the boundary (sent/received) only. Test: "Could this change without changing my topic's outcomes?" If yes, it's across the boundary.
+6. **Shared behavior:** Inline fully in every spec (self-contained). Note shared topics for cross-spec tracking. Shared behavior also gets its own canonical spec.
+7. **Spec format:** Markdown in `specs/`. Each spec includes: topic statement, scope (in-scope and boundaries), data contracts, behaviors (in execution order), and state transitions. Mark notable/surprising behavior, unreachable paths, and shared cross-topic behavior inline. Capture rationale from source comments (strip implementation references). File naming: `specs/NN-kebab-case.md` (e.g., `01-session-management.md`).
+8. When specs are complete and validated, `git add -A` then `git commit` with a message describing which specs were added/updated. After the commit, `git push`.
+
+99999. **Exhaustive checklist before finalizing:** Every entry point documented. Every branch traced to terminal. Every data contract. Every side effect in execution order. Every error path (caught/propagated/ignored). Every config-driven path. Concurrency outcomes. Unreachable paths marked. Notable/surprising behavior marked. Zero implementation details in output. If any item is missing, trace again.
+999999. The code is the source of truth. If specs are inconsistent with the code, update the spec using an Opus 4.6 subagent.
+9999999. Single sources of truth, no duplicated specs. Update existing specs rather than creating new ones.
+99999999. When you learn something new about the project, update @AGENTS.md using a subagent but keep it brief and operational only — no status updates or progress notes.
+999999999. Source comments explaining why behavior must be preserved (regulatory, compatibility, intentional) — capture rationale, strip implementation references. Stale comments are not spec.
+9999999999. Document all configuration-driven paths, not just the currently active one.
+99999999999. If you find inconsistencies in `specs/*` then use an Opus 4.6 subagent with 'ultrathink' to update the specs.</code></pre>
+                </div>
+
+                <p>
+                  — contributed by Jake Cukjati &middot;
+                  <a href="https://x.com/Byte0fCode">@Byte0fCode</a>
+                  &middot;
+                  <a href="https://github.com/jackstine">@jackstine</a>
+                </p>
+              </div>
+            </details>
           </section>
 
           <!-- Footer -->
